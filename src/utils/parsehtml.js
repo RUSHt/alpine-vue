@@ -7,7 +7,8 @@ export default function(html) {
 function parse(ele,output) {
     var c;
     var isTag  = ele instanceof HTMLElement;
-    if ( isTag ) {
+    
+    if ( isTag || !ele.wholeText ) {
         output.push(c = [ele.tagName,[],[]])
         var atts = ele.getAttributeNames();
         for ( var i = 0; i < atts.length; i ++ ) {
@@ -20,7 +21,7 @@ function parse(ele,output) {
         for ( var j = 0; j < childNodes.length; j++ ) {
             parse(childNodes[j],c[2])
         }
-    } else { 
+    } else {
         ele.wholeText && output.push(['#text',ele.wholeText,[]]) 
     }
     return output; 

@@ -5,7 +5,7 @@
             <p @click="newCodeIn">Vue</p>
         </header>
         <div class="container">
-            <textarea class="in" spellcheck="false" v-model="codein"></textarea>
+            <textarea class="in" spellcheck="false" v-model="codein" @keydown="keyDown($event)"></textarea>
             <code v-if="codeout" class="out">{{ codeout }}</code>
         </div>
     </div>
@@ -27,15 +27,25 @@ export default {
             codein: '<p>Paste Alpine.js Here...</p>',
             codeout: '',
             code: '<p>Hello</p>',
+            textarea: {},
             MEoptions: {
 
             }
         }
     },
     mounted () {
-
+        this.textarea = this.$el.querySelector('textarea');
     },
     methods: {
+        keyDown ( e ) {
+            if ( e.keyCode == 9 ) {
+                e.preventDefault();
+                var pos = this.textarea.selectionStart
+                var codein = this.codein;
+                this.codein = codein.substring(0,pos)+'  '+codein.substring(pos,codein.length);
+                this.textarea.setSelectionRange(pos + 2,pos + 2);
+            }
+        },
         newCodeIn () {
             
             var content = ConvertAlpineToVue(this.codein);
@@ -47,7 +57,7 @@ export default {
             if ( Object.keys(content.data).length > 0 ) {
                 var json = JSON.stringify(content.data,null,6);
                     json = json.substring(0,json.length - 1)+'    }';
-                this.codeout += '\n\n<script>\n\nexport default = {\n\n  data () {\n    return '+json+'\n  }\n}\n\n<\/script>';
+                this.codeout += '\n\n<script>\n\nexport default {\n\n  data () {\n    return '+json+'\n  }\n}\n\n<\/script>';
             }
 
         },

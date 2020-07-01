@@ -35,6 +35,13 @@ const transitionMap = [
     ]
 ].reduce((p,l) => { p[l[0]] = l[1]; return p; },{})
 
+const attMap = [
+    [
+        'x-show',
+        'v-show'
+    ]
+].reduce((p,l) => { p[l[0]] = l[1]; return p; },{})
+
 function transformAtoV(model,out,data) {
     
     var transition;
@@ -50,8 +57,17 @@ function transformAtoV(model,out,data) {
             if ( tag == 'SCRIPT' ) {
                 var alpineSrc = atts.find(a => a[0] == 'src');
                 if ( alpineSrc[1] == "https://cdn.jsdelivr.net/gh/alpinejs/alpine@v2.0.1/dist/alpine.js" ) { continue; }
-            }       
-            var d = document.createElement(tag);
+            }
+            
+            if ( tag == 'svg' || out._svg ) {
+                var d = document.createElementNS('http://www.ws.org/2000/svg',tag)
+                d._svg = true;
+            } else {
+                var d = document.createElement(tag);
+            }
+            
+            
+
             var attsLength = atts.length;
             for ( var j = 0; j < attsLength; j++ ) {
                 var att = atts[j][0];
@@ -63,9 +79,9 @@ function transformAtoV(model,out,data) {
                         transition = document.createElement('transition');
                         transition.appendChild(d);
                     }
-                    d.setAttribute(transitionMap[att],atts[j[1]]);
+                    transition.setAttribute(transitionMap[att],atts[j][1]);
                 } else {
-                    d.setAttribute(atts[j][0],atts[j][1]);
+                    d.setAttribute(attMap[att] || att,atts[j][1]);
                 }
                  
             }
